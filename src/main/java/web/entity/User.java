@@ -7,14 +7,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
 @Table(name="users")
-public class User implements Serializable, UserDetails {
+public class User implements UserDetails {
 
-    private static final long serialVersionUID = 1L;
+    //private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -93,7 +94,17 @@ public class User implements Serializable, UserDetails {
         this.roles = roles;
     }
 
-    @JsonIgnore
+    public void setRoles(String roles) {
+        this.roles = new HashSet<>();
+            if (roles.contains("ADMIN")) {
+                this.roles.add(new Role("ROLE_ADMIN"));
+            }
+            if (roles.contains("USER")) {
+                this.roles.add(new Role("ROLE_USER"));
+            }
+    }
+
+
     public String getRoleName() {
         return roles
                 .stream()
@@ -133,7 +144,7 @@ public class User implements Serializable, UserDetails {
         return true;
     }
 
-    @Override
+    @Transient
     public boolean isCredentialsNonExpired() {
         return true;
     }
